@@ -62,7 +62,7 @@ var setupPhotos = (function ($) {
             return 'icon-heart-empty';
         }
     }
-
+    //Adds like/dislike button
     function buttonAppender (ele, className) {
         var button = document.createElement('button');
         button.innerText = 'Favourite';
