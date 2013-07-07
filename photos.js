@@ -15,16 +15,17 @@ var setupPhotos = (function ($) {
     }
 
     var Item = {
+        collectionName: 'favourite_items',
         collection: [],
         //Retrieves all items from local storage as an array
         retrieveCollection : function () {
-            this.collection = localStorage['favourites'] ?
-                localStorage['favourites'].split(';') :
+            this.collection = localStorage[this.collectionName] ?
+                localStorage[this.collectionName].split(';') :
                 [];
         },
         //Saves all items to local storage as a string
         saveCollection : function () {
-            localStorage['favourites'] = this.collection.join(';');
+            localStorage[this.collectionName] = this.collection.join(';');
         },
         // Adds new item
         add : function (key) {
@@ -75,6 +76,7 @@ var setupPhotos = (function ($) {
     function hookEvents (holder) {
         var clickHandler = function(e) {
             if (e.target.tagName == 'BUTTON') {
+                e.preventDefault();
                 var src = e.target.previousSibling.src;
                 if (Item.isFavourite(src)) {
                     Item.remove(src);
