@@ -14,6 +14,81 @@ var setupPhotos = (function ($) {
         });
     }
 
+    var Item = {
+        collection: [],
+        //Retrieves all items from local storage as an array
+        updateCollection : function() {
+            this.collection = localStorage['favourites'] ?
+                localStorage['favourites'].split(';') :
+                [];
+        },
+        //Saves all items to local storage as a string
+        saveCollection: function(items) {
+            localStorage['favourites'] = this.collection.join(';');
+        },
+        // Adds new item
+        add : function(key) {
+            this.collection.push(key);
+            this.saveCollection();
+        },
+        //Removes item
+        remove : function(key) {
+            var index = this.getIndex(key);
+
+            if (index !== -1) {
+                this.collection.splice(index, 1);
+                this.saveCollection();
+            }
+        },
+        //Looks for item index in collection
+        getIndex: function(key) {
+            return this.collection.indexOf(key);
+        },
+        //Wrapper for getIndex method
+        isFavourite : function(key) {
+            return this.getIndex(key) !== -1 ?
+                true :
+                false;
+        }
+    };
+
+    Item.updateCollection();
+
+    //Returns proper class name
+    function chooseClass(src) {
+        if (Item.isFavourite(src)) {
+            return 'icon-heart';
+        } else {
+            return 'icon-heart-empty';
+        }
+    }
+
+    function buttonAppender(ele, className) {
+        var button = document.createElement('button');
+        button.innerText = 'Favourite';
+        button.type = 'button';
+        button.className = className;
+        ele.appendChild(button);
+    }
+
+    //Binds all user events
+    function hookEvents(holder) {
+        var clickHandler = function(e) {
+            if (e.target.tagName == 'BUTTON') {
+                var src = e.target.previousSibling.src;
+                if (Item.isFavourite(src)) {
+                    Item.remove(src);
+                } else {
+                    Item.add(src);
+                }
+                e.target.className = chooseClass(src);
+            }
+        };
+
+        var container = document.getElementById(holder);
+        container.addEventListener('click', clickHandler, false);
+    }
+
     function loadPhotosByTag (tag, max, callback) {
         var photos = [];
         var callback_name = 'callback_' + Math.floor(Math.random() * 100000);
@@ -67,6 +142,9 @@ var setupPhotos = (function ($) {
             var elm = document.createElement('div');
             elm.className = 'photo';
             elm.appendChild(img);
+
+            buttonAppender(elm, chooseClass(img.src));
+
             holder.appendChild(elm);
         };
     }
@@ -79,6 +157,7 @@ var setupPhotos = (function ($) {
             if (err) { return callback(err); }
 
             each(items.map(renderPhoto), imageAppender('photos'));
+            hookEvents('photos');
             callback();
         });
     };
