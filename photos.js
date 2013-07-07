@@ -17,22 +17,22 @@ var setupPhotos = (function ($) {
     var Item = {
         collection: [],
         //Retrieves all items from local storage as an array
-        updateCollection : function() {
+        retrieveCollection : function () {
             this.collection = localStorage['favourites'] ?
                 localStorage['favourites'].split(';') :
                 [];
         },
         //Saves all items to local storage as a string
-        saveCollection : function(items) {
+        saveCollection : function (items) {
             localStorage['favourites'] = this.collection.join(';');
         },
         // Adds new item
-        add : function(key) {
+        add : function (key) {
             this.collection.push(key);
             this.saveCollection();
         },
         //Removes item
-        remove : function(key) {
+        remove : function (key) {
             var index = this.getIndex(key);
 
             if (index !== -1) {
@@ -41,21 +41,21 @@ var setupPhotos = (function ($) {
             }
         },
         //Looks for item index in collection
-        getIndex : function(key) {
+        getIndex : function (key) {
             return this.collection.indexOf(key);
         },
         //Wrapper for getIndex method
-        isFavourite : function(key) {
+        isFavourite : function (key) {
             return this.getIndex(key) !== -1 ?
                 true :
                 false;
         }
     };
 
-    Item.updateCollection();
+    Item.retrieveCollection();
 
     //Returns proper class name
-    function chooseClass(src) {
+    function chooseClass (src) {
         if (Item.isFavourite(src)) {
             return 'icon-heart';
         } else {
@@ -63,7 +63,7 @@ var setupPhotos = (function ($) {
         }
     }
 
-    function buttonAppender(ele, className) {
+    function buttonAppender (ele, className) {
         var button = document.createElement('button');
         button.innerText = 'Favourite';
         button.type = 'button';
@@ -72,7 +72,7 @@ var setupPhotos = (function ($) {
     }
 
     //Binds all user events
-    function hookEvents(holder) {
+    function hookEvents (holder) {
         var clickHandler = function(e) {
             if (e.target.tagName == 'BUTTON') {
                 var src = e.target.previousSibling.src;
