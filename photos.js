@@ -23,7 +23,7 @@ var setupPhotos = (function ($) {
                 [];
         },
         //Saves all items to local storage as a string
-        saveCollection : function (items) {
+        saveCollection : function () {
             localStorage['favourites'] = this.collection.join(';');
         },
         // Adds new item
