@@ -23,7 +23,7 @@ var setupPhotos = (function ($) {
                 [];
         },
         //Saves all items to local storage as a string
-        saveCollection: function(items) {
+        saveCollection : function(items) {
             localStorage['favourites'] = this.collection.join(';');
         },
         // Adds new item
@@ -41,7 +41,7 @@ var setupPhotos = (function ($) {
             }
         },
         //Looks for item index in collection
-        getIndex: function(key) {
+        getIndex : function(key) {
             return this.collection.indexOf(key);
         },
         //Wrapper for getIndex method
