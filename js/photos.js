@@ -74,8 +74,9 @@ var setupPhotos = (function ($) {
     }
 
     //Binds all user events
-    function hookEvents ($holder) {
-        var clickHandler = function(e) {
+    function hookEvents ($holder, tags) {
+        //click event
+        var clickHandler = function (e) {
             e.preventDefault();
             
             var $button = $(this),
@@ -91,6 +92,15 @@ var setupPhotos = (function ($) {
         };
 
         $holder.on('click', 'button', clickHandler);
+
+        infScroll(null, function (deferred) {
+            loadAllPhotos(tags, max_per_tag, function (err, items) {
+                if (err) return;
+                
+                each(items.map(renderPhoto), imageAppender('photos'));
+                deferred.resolve();           
+            });
+        })
     }
 
     function loadPhotosByTag (tag, max, callback) {
@@ -153,15 +163,70 @@ var setupPhotos = (function ($) {
         };
     }
 
+    function infScroll (settings, callback) {
+        var options = {
+            bottomOffset: 150,
+            container: $('#photos'),
+            ajaxLoader: $('#ajax-loader')
+        };
+
+        if (settings) {
+            options = $.extend(options, settings);
+        }
+
+        //cache
+        var $w = $(window),
+            $doc = $(document),
+            isAjaxLoading = false;
+
+        function handler (e) {
+            //checks if ajax call is in progress, if so then do nothing
+            if (isAjaxLoading) return;
+            
+            var waitForCallback = $.Deferred(),
+                //some math to check if user scrolled to the bottom of page
+                isBottomReached = $doc.height() - $w.height() - $w.scrollTop() < options.bottomOffset;
+
+            if (isBottomReached) {
+                isAjaxLoading = !isAjaxLoading;
+                options.ajaxLoader.show();
+                //deffered object is passed to callback function
+                //to be resolved when ajax response is received
+                callback(waitForCallback);
+                //waits for ajax to finish before hides ajax loader and lets function
+                //to make another call
+                waitForCallback.done(function(){
+                    isAjaxLoading = !isAjaxLoading;
+                    options.ajaxLoader.hide();
+                });
+            }
+        }
+        //images are appended to DOM asynchroniously so we want a real height of element
+        //that's why I push execution of this function to a stack
+        function compareToWindowHeight () {
+            setTimeout(function(){
+                if (options.container.height() < $w.height()) {
+                    $doc.trigger('scroll');
+                    compareToWindowHeight();
+                }
+            }, 200);
+        }
+
+        $doc.on('scroll', handler);
+
+        compareToWindowHeight();
+    }
+    
     // ----
     
     var max_per_tag = 5;
+
     return function setup (tags, callback) {
         loadAllPhotos(tags, max_per_tag, function (err, items) {
             if (err) { return callback(err); }
 
             each(items.map(renderPhoto), imageAppender('photos'));
-            hookEvents($('#photos'));
+            hookEvents($('#photos'), tags);
             callback();
         });
     };
