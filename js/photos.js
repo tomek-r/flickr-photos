@@ -43,7 +43,7 @@ var setupPhotos = (function ($) {
         },
         //Looks for item index in collection
         getIndex : function (key) {
-            return this.collection.indexOf(key);
+            return $.inArray(key, this.collection);
         },
         //Wrapper for getIndex method
         isFavourite : function (key) {
@@ -63,32 +63,34 @@ var setupPhotos = (function ($) {
             return 'icon-heart-empty';
         }
     }
+
     //Adds like/dislike button
     function buttonAppender (ele, className) {
-        var button = document.createElement('button');
-        button.innerText = 'Favourite';
-        button.type = 'button';
-        button.className = className;
-        ele.appendChild(button);
+        $('<button />', {
+            'type' : 'button',
+            'class': className,
+            'text': 'Favourite'
+        }).appendTo(ele);
     }
 
     //Binds all user events
-    function hookEvents (holder) {
+    function hookEvents ($holder) {
         var clickHandler = function(e) {
-            if (e.target.tagName == 'BUTTON') {
-                e.preventDefault();
-                var src = e.target.previousSibling.src;
-                if (Item.isFavourite(src)) {
-                    Item.remove(src);
-                } else {
-                    Item.add(src);
-                }
-                e.target.className = chooseClass(src);
+            e.preventDefault();
+            
+            var $button = $(this),
+                src = $button.prev().attr('src');
+
+            if (Item.isFavourite(src)) {
+                Item.remove(src);
+            } else {
+                Item.add(src);
             }
+
+            $button.attr('class', chooseClass(src));
         };
 
-        var container = document.getElementById(holder);
-        container.addEventListener('click', clickHandler, false);
+        $holder.on('click', 'button', clickHandler);
     }
 
     function loadPhotosByTag (tag, max, callback) {
@@ -159,7 +161,7 @@ var setupPhotos = (function ($) {
             if (err) { return callback(err); }
 
             each(items.map(renderPhoto), imageAppender('photos'));
-            hookEvents('photos');
+            hookEvents($('#photos'));
             callback();
         });
     };
