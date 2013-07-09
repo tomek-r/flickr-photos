@@ -98,7 +98,7 @@ var setupPhotos = (function ($) {
                 if (err) return;
                 
                 each(items.map(renderPhoto), imageAppender('photos'));
-                //we are finished here so make the loader disappear
+                //we finished here so make the loader disappear
                 deferred.resolve();           
             });
         })
@@ -166,10 +166,10 @@ var setupPhotos = (function ($) {
 
     function infScroll (settings, callback) {
         var options = {
-            bottomOffset: 150,
-            container: $('#photos'),
-            ajaxLoader: $('#ajax-loader')
-        };
+                bottomOffset: 150,
+                container: $('#photos'),
+                ajaxLoader: $('#ajax-loader')
+            };
 
         if (settings) {
             options = $.extend(options, settings);
