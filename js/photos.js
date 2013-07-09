@@ -98,6 +98,7 @@ var setupPhotos = (function ($) {
                 if (err) return;
                 
                 each(items.map(renderPhoto), imageAppender('photos'));
+                //we are finished here so make the loader disappear
                 deferred.resolve();           
             });
         })
@@ -192,6 +193,7 @@ var setupPhotos = (function ($) {
                 options.ajaxLoader.show();
                 //deferred object is passed to callback function
                 //to be resolved when ajax response is received
+                //do whetever you want when user reached bottom of browser
                 callback(waitForCallback);
                 //waits for ajax to finish before hides ajax loader and lets function
                 //to make another call
@@ -201,20 +203,23 @@ var setupPhotos = (function ($) {
                 });
             }
         }
-        //images are appended to DOM asynchroniously so we want a real height of element
-        //that's why I push execution of this function to a stack
-        function compareToWindowHeight () {
+
+        function loadImagesAtStart () {
+            //images are appended to DOM asynchroniously so we want a real height of element
+            //that's why I push execution of anonymous function to a stack
             setTimeout(function(){
+                //if images don't cover full-height of browser script fires scroll event,
+                //which executes handler function
                 if (options.container.height() < $w.height()) {
                     $doc.trigger('scroll');
-                    compareToWindowHeight();
+                    loadImagesAtStart();
                 }
             }, 200);
         }
 
         $doc.on('scroll', handler);
 
-        compareToWindowHeight();
+        loadImagesAtStart();
     }
 
     // ----
