@@ -190,7 +190,7 @@ var setupPhotos = (function ($) {
             if (isBottomReached) {
                 isAjaxLoading = !isAjaxLoading;
                 options.ajaxLoader.show();
-                //deffered object is passed to callback function
+                //deferred object is passed to callback function
                 //to be resolved when ajax response is received
                 callback(waitForCallback);
                 //waits for ajax to finish before hides ajax loader and lets function
@@ -216,7 +216,7 @@ var setupPhotos = (function ($) {
 
         compareToWindowHeight();
     }
-    
+
     // ----
     
     var max_per_tag = 5;
