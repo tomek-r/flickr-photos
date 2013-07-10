@@ -93,15 +93,17 @@ var setupPhotos = (function ($) {
 
         $holder.on('click', 'button', clickHandler);
 
-        infScroll(null, function (deferred) {
-            loadAllPhotos(tags, max_per_tag, function (err, items) {
-                if (err) return;
-                
-                each(items.map(renderPhoto), imageAppender('photos'));
-                //we finished here so make the loader disappear
-                deferred.resolve();           
-            });
-        })
+        infScroll({
+            update: function (deferred) {
+                loadAllPhotos(tags, max_per_tag, function (err, items) {
+                    if (err) return;
+                    
+                    each(items.map(renderPhoto), imageAppender('photos'));
+                    //we finished here so make the loader disappear
+                    deferred.resolve();           
+                });
+            }
+        });
     }
 
     function loadPhotosByTag (tag, max, callback) {
@@ -164,11 +166,12 @@ var setupPhotos = (function ($) {
         };
     }
 
-    function infScroll (settings, callback) {
+    function infScroll (settings) {
         var options = {
                 bottomOffset: 150,
                 container: $('#photos'),
-                ajaxLoader: $('#ajax-loader')
+                ajaxLoader: $('#ajax-loader'),
+                update: function (deferred) {}
             };
 
         if (settings) {
@@ -194,7 +197,7 @@ var setupPhotos = (function ($) {
                 //deferred object is passed to callback function
                 //to be resolved when ajax response is received
                 //do whetever you want when user reached bottom of browser
-                callback(waitForCallback);
+                options.update(waitForCallback);
                 //waits for ajax to finish before hides ajax loader and lets function
                 //to make another call
                 waitForCallback.done(function(){
