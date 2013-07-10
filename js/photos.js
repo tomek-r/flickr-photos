@@ -102,7 +102,8 @@ var setupPhotos = (function ($) {
                     //we finished here so make the loader disappear
                     deferred.resolve();           
                 });
-            }
+            },
+            forceScrollAppear: true
         });
     }
 
@@ -171,6 +172,7 @@ var setupPhotos = (function ($) {
                 bottomOffset: 150,
                 container: $('#photos'),
                 ajaxLoader: $('#ajax-loader'),
+                forceScrollAppear: false,
                 update: function (deferred) {}
             };
 
@@ -207,7 +209,8 @@ var setupPhotos = (function ($) {
             }
         }
 
-        function loadImagesAtStart () {
+
+        function loadAssetsOnStart () {
             //images are appended to DOM asynchroniously so we want a real height of element
             //that's why I push execution of anonymous function to a stack
             setTimeout(function(){
@@ -215,14 +218,16 @@ var setupPhotos = (function ($) {
                 //which executes handler function
                 if (options.container.height() < $w.height()) {
                     $doc.trigger('scroll');
-                    loadImagesAtStart();
+                    loadAssetsOnStart();
                 }
             }, 200);
         }
 
         $doc.on('scroll', handler);
 
-        loadImagesAtStart();
+        if (options.forceScrollAppear) {
+            loadAssetsOnStart();
+        }
     }
 
     // ----
